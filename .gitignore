@@ -1,0 +1,5 @@
+.output
+bin/upgrade
+bin/eagle.flash.bin
+bin/eagle.irom0text.bin
+bin/library/*

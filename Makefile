@@ -417,6 +417,16 @@ help:
 	@echo "make clean     : clean binary files"
 	@echo "make distclean : clean binary files and folders"
 	@echo "make help      : help info"
+	@echo "parameters: (parameter = value)"
+	@echo "ESPPORT      = "$(ESPPORT)
+	@echo "DOWNLOADBAUD = "$(DOWNLOADBAUD)
+	@echo "BOOT         = "$(BOOT)
+	@echo "APP          = "$(APP)
+	@echo "SPI_SPEED    = "$(SPI_SPEED)
+	@echo "SPI_MODE     = "$(SPI_MODE)
+	@echo "SPI_SIZE_MAP = "$(SPI_SIZE_MAP)
+	@echo "OS           = "$(OS)
+	@echo "COMPILE      = "$(COMPILE)
 
 clean:
 	$(foreach d, $(SUBDIRS), $(MAKE) -C $(d) clean;)
