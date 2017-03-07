@@ -1,30 +1,85 @@
 #  copyright (c) 2010 Espressif System
-#
+#  optimized by neucrack, refer to vowstar's modification
+
+#parameter eg:
+# ESPPORT = /dev/ttyUSB0
+# DOWNLOADBAUD=1500000
+# BOOT = new
+# APP = 1
+# SPI_SPEED = 40
+# SPI_MODE = DIO
+# SPI_SIZE_MAP = 2
+# OS = Windows_NT
+# COMPILE = gcc
+# 
 ifndef PDIR
 
 endif
 
-ifeq ($(COMPILE), gcc)
-	AR = xtensa-lx106-elf-ar
-	CC = xtensa-lx106-elf-gcc
-	NM = xtensa-lx106-elf-nm
-	CPP = xtensa-lx106-elf-cpp
-	OBJCOPY = xtensa-lx106-elf-objcopy
-	OBJDUMP = xtensa-lx106-elf-objdump
+ifneq ($(wildcard bin/.*),)
+	FW_PATH		?= bin
+	ESPTOOL		?= python tools/esptool.py
 else
+	FW_PATH		?= ../bin
+	ESPTOOL		?= python ../tools/esptool.py
+endif
+
+DOWNLOADBAUD ?= 1500000
+BOOT?=new
+APP?=1
+SPI_SPEED?=40
+SPI_MODE?=dio
+SPI_SIZE_MAP?=2
+COMPILE?=gcc
+SPI_MODE := $(shell echo $(SPI_MODE) | tr '[A-Z]' '[a-z]')
+
+
+# esptool path and port
+ifeq ($(OS),Windows_NT)
+	ESPTOOL		?= esptool.exe
+	ifeq ($(TERM),cygwin)
+		ESPPORT		?= /dev/ttyS2
+	else
+		ESPPORT		?= COM3
+	endif
+else
+	ESPTOOL		?= esptool
+	UNAME_S		:= $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		ESPPORT		?= /dev/cu.SLAB_USBtoUART
+	endif
+	ifeq ($(UNAME_S),Linux)
+		ESPPORT		?= /dev/ttyUSB0
+	endif
+endif
+
+ifeq ($(XTENSA_CORE),lx106)
+	# It is xcc
 	AR = xt-ar
 	CC = xt-xcc
 	NM = xt-nm
 	CPP = xt-cpp
 	OBJCOPY = xt-objcopy
 	OBJDUMP = xt-objdump
+else 
+	ifeq ($(COMPILE), gcc)
+		AR = xtensa-lx106-elf-ar
+		CC = xtensa-lx106-elf-gcc
+		NM = xtensa-lx106-elf-nm
+		CPP = xtensa-lx106-elf-cpp
+		OBJCOPY = xtensa-lx106-elf-objcopy
+		OBJDUMP = xtensa-lx106-elf-objdump
+	else
+		AR = xt-ar
+		CC = xt-xcc
+		NM = xt-nm
+		CPP = xt-cpp
+		OBJCOPY = xt-objcopy
+		OBJDUMP = xt-objdump
+	endif
 endif
 
-BOOT?=none
-APP?=0
-SPI_SPEED?=40
-SPI_MODE?=QIO
-SPI_SIZE_MAP?=0
+
 
 ifeq ($(BOOT), new)
     boot = new
@@ -61,13 +116,13 @@ else
 endif
 
 
-ifeq ($(SPI_MODE), QOUT)
+ifeq ($(SPI_MODE), qout)
     mode = 1
 else
-    ifeq ($(SPI_MODE), DIO)
+    ifeq ($(SPI_MODE), dio)
         mode = 2
     else
-        ifeq ($(SPI_MODE), DOUT)
+        ifeq ($(SPI_MODE), dout)
             mode = 3
         else
             mode = 0
@@ -297,9 +352,79 @@ endif
 
 all:	.subdirs $(OBJS) $(OLIBS) $(OIMAGES) $(OBINS) $(SPECIAL_MKTARGETS)
 
+flash: all
+	@echo "Programming ..."
+	@$(ESPTOOL) --port $(ESPPORT) --baud $(DOWNLOADBAUD) write_flash --flash_mode $(SPI_MODE) --flash_size 8m \
+	0x00000 $(FW_PATH)/boot_v1.6.bin \
+	0x01000 $(FW_PATH)/upgrade/user1.1024.new.2.bin \
+	0xFC000 $(FW_PATH)/esp_init_data_default.bin \
+	0x7e000 $(FW_PATH)/blank.bin \
+	0xFE000 $(FW_PATH)/blank.bin	
+	@echo "Please set baudrate and other configuration, e.g."
+	@echo "stty -F $(ESPPORT) speed 115200 cs8 -cstopb"
+	@echo "Now you can watch debug output"
+	@echo "cat $(ESPPORT)"
+	@echo "Using [CTRL+C] to stop it"
+	@echo "Firmware Map"
+	@echo "boot_v1.6.bin---------------->\033[0;33m0x00000\033[0m"
+	@echo "user1.4096.new.4.bin--------->\033[0;33m0x01000\033[0m"
+	@echo "user2.4096.new.4.bin--------->\033[0;33m0x81000\033[0m"
+	@echo "blank.bin-------------------->\033[0;33m0x7E000\033[0m"
+	@echo "\033[92m[Finish]\033[0m"
+
+#       -$(ESPTOOL) -cd nodemcu -cb 921600 -cp $(ESPPORT)                       \
+#       -ca 0x00000 -cf $(FW_PATH)/boot_v1.6_vowstar.bin                        \
+#       -ca 0x01000 -cf $(FW_PATH)/upgrade/user1.1024.new.2.bin         \
+#       -ca 0xFC000 -cf $(FW_PATH)/esp_init_data_default.bin            \
+#       -ca 0x7e000 -cf $(FW_PATH)/blank.bin                                            \
+#       -ca 0xFE000 -cf $(FW_PATH)/blank.bin 
+
+wificlean:
+	@echo "Cleaning wifi ..."
+	@$(ESPTOOL) --port $(ESPPORT) --baud $(DOWNLOADBAUD) write_flash --flash_mode $(SPI_MODE) --flash_size 8m \
+	0xFC000 $(FW_PATH)/esp_init_data_default.bin \
+	0x7e000 $(FW_PATH)/blank.bin \
+	0xFE000 $(FW_PATH)/blank.bin	
+#	-$(ESPTOOL) -cd nodemcu -cb 921600 -cp $(ESPPORT) 			\
+#	-ca 0xFC000 -cf $(FW_PATH)/esp_init_data_default.bin        \
+#	-ca 0x7e000 -cf $(FW_PATH)/blank.bin 						\
+#	-ca 0xFE000 -cf $(FW_PATH)/blank.bin 			
+
+dataclean:
+	@echo "Cleaning data ..." 
+	@$(ESPTOOL) --port $(ESPPORT) --baud $(DOWNLOADBAUD) write_flash --flash_mode $(SPI_MODE) --flash_size 8m \
+	0xF4000 $(FW_PATH)/blank.bin \
+	0xF5000 $(FW_PATH)/blank.bin \
+	0xF6000 $(FW_PATH)/blank.bin
+#	-$(ESPTOOL) -cd nodemcu -cb 921600 -cp $(ESPPORT) 			\
+#	-ca 0xF4000 -cf $(FW_PATH)/blank.bin 						\
+#	-ca 0xF5000 -cf $(FW_PATH)/blank.bin 						\
+#	-ca 0xF6000 -cf $(FW_PATH)/blank.bin
+
+erase:
+	@echo "Erasing flash ..."
+	@$(ESPTOOL) --port $(ESPPORT) --baud $(DOWNLOADBAUD) erase_flash
+#	-$(ESPTOOL) -cd nodemcu -cb 921600 -cp $(ESPPORT) -ce
+
+monitor:
+	python -m serial.tools.miniterm --rts 0 --dtr 0 --raw $(ESPPORT) 115200
+
+help:
+	@echo "make           : compile project"
+	@echo "make flash     : compile and upload code to flash of board"
+	@echo "make erase     : erase all data in flash"
+	@echo "make monitor   : serial monitor tool"
+	@echo "make clean     : clean binary files"
+	@echo "make distclean : clean binary files and folders"
+	@echo "make help      : help info"
+
 clean:
 	$(foreach d, $(SUBDIRS), $(MAKE) -C $(d) clean;)
 	$(RM) -r $(ODIR)/$(TARGET)/$(FLAVOR)
+
+distclean:
+	$(foreach d, $(SUBDIRS), $(MAKE) -C $(d) distclean;)
+	$(RM) -r $(ODIR)
 
 clobber: $(SPECIAL_CLOBBER)
 	$(foreach d, $(SUBDIRS), $(MAKE) -C $(d) clobber;)
@@ -375,6 +500,6 @@ $(foreach image,$(GEN_IMAGES),$(eval $(call MakeImage,$(basename $(image)))))
 # Required for each makefile to inherit from the parent
 #
 
-INCLUDES := $(INCLUDES) -I $(PDIR)include -I $(PDIR)include/$(TARGET) -I $(PDIR)driver_lib/include
+INCLUDES := $(INCLUDES) -I $(PDIR)include -I $(PDIR)include/$(TARGET)
 PDIR := ../$(PDIR)
 sinclude $(PDIR)Makefile

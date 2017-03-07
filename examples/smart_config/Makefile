@@ -122,4 +122,3 @@ sinclude $(PDIR)Makefile
 
 .PHONY: FORCE
 FORCE:
-
