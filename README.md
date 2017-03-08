@@ -4,17 +4,16 @@
 * driver and project can be built directly at you first get this project
 
 # How To Use
-* [install docker](https://docs.docker.com/engine/installation/)
-* create container(set up compile environment and download tool etc.)
-
-pull docker image:
+### 1. [install docker](https://docs.docker.com/engine/installation/)
+### 2. create container(set up compile environment and download tool etc.)
+* pull docker image:
 ```
 docker pull neucrack/esp-build
 or
 docker pull daocloud.io/neucrack/esp-build
 ```
-plug in you device(eg:node mcu)
-create a container
+* plug in you device(eg:node mcu)
+* create a container
 ```
 docker run -ti --name esp8266-builder --device /dev/ttyUSB0:/dev/ttyUSB0 -v dir:/build neucrack/esp-build /bin/bash
 ```
@@ -25,7 +24,7 @@ docker start esp8266-builder
 docker attach esp8266-builder
 ```
 
-* build project and download to board
+### 3. build project and download to board
 run in container
 ```
 cd /build/esp8266-nonos-sdk
@@ -79,9 +78,9 @@ You can also use gen_misc to make and generate specific bin you needed.
     Windows: gen_misc.bat
     Follow the tips and steps by steps.
 ```
-* monitor serial output
+### 4. monitor serial output
 use serial monitor:</br>
-when **linux** ,use `minicom` or `screen`
+* when **linux** ,use `minicom` or `screen`
 use `minicom`
 ```
 sudo apt install minicom
@@ -96,12 +95,12 @@ screen /dev/ttyUSB0 115200
 ```
 exit screen:</br>
 <kbd>ctrl+A</kbd> -> <kbd>K</kbd> -> <kbd>Y</kbd></br>
-when **docker**,use:
+* when **docker**,use:
 ```
 make monitor
 ```
 (pay attenrion, RTS and DTR are locked, so push reset button will not functional, use <kbd>ctrl+T</kbd>-><kbd>ctrl+H</kbd> to see help)
-when **windows**,use serial monitor with GUI,such as **UartAssist.exe**
+* when **windows**,use serial monitor with GUI,such as **UartAssist.exe**
 
 # directories description
 ```
