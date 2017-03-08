@@ -26,13 +26,21 @@
 #include "user_interface.h"
 #include "driver/uart.h"
 
+void ICACHE_FLASH_ATTR
+hello(void)
+{
+	os_printf("hello 8266!\n");
+}
 
 void ICACHE_FLASH_ATTR
 user_init(void)
 {
 	UART_SetPrintPort(UART0);
     uart_div_modify(0, 80 * 1000000 / 115200);
-    os_delay_us(100);
+    os_delay_us(200);
+    static os_timer_t tick_timer;
+	os_timer_disarm(&tick_timer);
+	os_timer_setfn(&tick_timer, hello , NULL);   //a demo to process the data in uart rx buffer
+    os_timer_arm(&tick_timer,1000,true);
     os_printf("compile time:%s %s",__DATE__,__TIME__);
-    os_printf("hello 8266!\n");
 }
