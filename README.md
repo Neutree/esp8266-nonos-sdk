@@ -6,6 +6,7 @@
 # How To Use
 * [install docker](https://docs.docker.com/engine/installation/)
 * create container(set up compile environment and download tool etc.)
+
 pull docker image:
 ```
 docker pull neucrack/esp-build
@@ -23,8 +24,9 @@ when pull and run completed, the next time you want use this container by
 docker start esp8266-builder
 docker attach esp8266-builder
 ```
-* build project
-run in container
+
+* build project and download to board
+run in containe
 ```
 cd /build/esp8266-nonos-sdk
 make flash
