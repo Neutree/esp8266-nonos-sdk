@@ -26,7 +26,7 @@ docker attach esp8266-builder
 ```
 
 * build project and download to board
-run in containe
+run in container
 ```
 cd /build/esp8266-nonos-sdk
 make flash
@@ -79,6 +79,28 @@ You can also use gen_misc to make and generate specific bin you needed.
     Windows: gen_misc.bat
     Follow the tips and steps by steps.
 ```
+* monitor serial output
+use serial monitor:
+when **linux** ,use `minicom` or `screen`
+```
+sudo apt install minicom
+sudo minicom -s  (setting /deb/ttyUSB0 115200 8n1)
+sudo minicom -c on
+```
+exit minicom:
+<kbd>ctrl+A</kbd> -> <kbd>X</kbd> -> <kbd>Enter</kbd>
+**or**
+```
+screen /dev/ttyUSB0 115200
+```
+exit screen:
+<kbd>ctrl+A</kbd> -> <kbd>K</kbd> -> <kbd>Y</kbd>
+when **docker**,use:
+```
+make monitor
+```
+(pay attenrion, RTS and DTR are locked, so push reset button will not functional, use <kbd>ctrl+T</kbd>-><kbd>ctrl+H</kbd> to see help)
+when **windows**,use serial monitor with GUI,such as **UartAssist.exe**
 
 # directories description
 ```
