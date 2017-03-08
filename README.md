@@ -80,21 +80,22 @@ You can also use gen_misc to make and generate specific bin you needed.
     Follow the tips and steps by steps.
 ```
 * monitor serial output
-use serial monitor:
+use serial monitor:</br>
 when **linux** ,use `minicom` or `screen`
+use `minicom`
 ```
 sudo apt install minicom
 sudo minicom -s  (setting /deb/ttyUSB0 115200 8n1)
 sudo minicom -c on
 ```
-exit minicom:
-<kbd>ctrl+A</kbd> -> <kbd>X</kbd> -> <kbd>Enter</kbd>
-**or**
+exit minicom:</br>
+<kbd>ctrl+A</kbd> -> <kbd>X</kbd> -> <kbd>Enter</kbd></br>
+or use `screen`
 ```
 screen /dev/ttyUSB0 115200
 ```
-exit screen:
-<kbd>ctrl+A</kbd> -> <kbd>K</kbd> -> <kbd>Y</kbd>
+exit screen:</br>
+<kbd>ctrl+A</kbd> -> <kbd>K</kbd> -> <kbd>Y</kbd></br>
 when **docker**,use:
 ```
 make monitor
