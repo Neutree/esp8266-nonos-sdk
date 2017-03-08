@@ -78,6 +78,7 @@ You can also use gen_misc to make and generate specific bin you needed.
     Windows: gen_misc.bat
     Follow the tips and steps by steps.
 ```
+
 ### 4. monitor serial output
 use serial monitor:</br>
 * when **linux** ,use `minicom` or `screen`
