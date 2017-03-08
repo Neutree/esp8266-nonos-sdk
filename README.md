@@ -4,8 +4,12 @@
 * driver and project can be built directly at you first get this project
 
 # How To Use
-### 1. [install docker](https://docs.docker.com/engine/installation/)
-### 2. create container(set up compile environment and download tool etc.)
+### 1. clone this project
+```
+git clone https://github.com/Neutree/esp8266-nonos-sdk.git
+```
+### 2. [install docker](https://docs.docker.com/engine/installation/)
+### 3. create container(set up compile environment and download tool etc.)
 * pull docker image:
 ```
 docker pull neucrack/esp-build
@@ -24,7 +28,7 @@ docker start esp8266-builder
 docker attach esp8266-builder
 ```
 
-### 3. build project and download to board
+### 4. build project and download to board
 run in container
 ```
 cd /build/esp8266-nonos-sdk
@@ -79,7 +83,7 @@ You can also use gen_misc to make and generate specific bin you needed.
     Follow the tips and steps by steps.
 ```
 
-### 4. monitor serial output
+### 5. monitor serial output
 use serial monitor:</br>
 * when **linux** ,use `minicom` or `screen`
 use `minicom`
