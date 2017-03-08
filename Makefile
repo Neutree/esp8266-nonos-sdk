@@ -435,6 +435,7 @@ clean:
 distclean:
 	$(foreach d, $(SUBDIRS), $(MAKE) -C $(d) distclean;)
 	$(RM) -r $(ODIR)
+	$(RM) -r bin/upgrade
 
 clobber: $(SPECIAL_CLOBBER)
 	$(foreach d, $(SUBDIRS), $(MAKE) -C $(d) clobber;)
